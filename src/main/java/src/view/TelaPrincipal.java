@@ -7,20 +7,18 @@ package src.view;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.color.ColorSpace;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneLayout;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import src.controller.TabuleiroController;
+import src.model.Observador;
 
 /**
  *
@@ -28,19 +26,13 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 class TabuleiroVelha extends AbstractTableModel {
 
+    final private TabuleiroController controller = TabuleiroController.getInstance();
     final private int tamanhoTabuleiro;
+    String[][] tabuleiro;
 
     public TabuleiroVelha(int tamanho) {
         this.tamanhoTabuleiro = tamanho;
     }
-
-    JLabel jLabel = new JLabel();
-
-    String[][] dados = {
-        {"X", "O", "O"},
-        {"O", "X", "O"},
-        {"O", "O", "X"}
-    };
 
     private static final long serialVersionUID = 1L;
 
@@ -57,8 +49,7 @@ class TabuleiroVelha extends AbstractTableModel {
     @Override
     public Object getValueAt(int row, int col) {
         try {
-
-            return " ";
+            return controller.getCampo(row, col);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.toString());
             return null;
@@ -82,7 +73,10 @@ class TabuleiroRenderer extends DefaultTableCellRenderer {
 
 }
 
-public class TelaPrincipal extends javax.swing.JFrame {
+public class TelaPrincipal extends javax.swing.JFrame implements Observador{
+
+    int tamanhoTabuleiro;
+    final private TabuleiroController controle;
 
     /**
      * Creates new form TelaPrincipal
@@ -90,6 +84,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
     public TelaPrincipal() {
         initComponents();
         this.setLocationRelativeTo(null);
+        controle = TabuleiroController.getInstance();
+        controle.addObservador(this);
     }
 
     /**
@@ -203,25 +199,27 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         if (this.backgroundTabuleiro == null) {
             montaContainerTabuleiro();
+            controle.setTabuleiro(toMatriz(tabuleiro));
         } else {
             jPanelTabuleiro.remove(backgroundTabuleiro);
             montaContainerTabuleiro();
+            controle.setTabuleiro(toMatriz(tabuleiro));
         }
 
     }
 
     public void montaContainerTabuleiro() {
 
-        int tamanhoTabuleiro = Integer.parseInt(JOptionPane.showInputDialog(" Qual a dimensão do tabuleiro?\n Digite:    3 ~> (3x3)\n                ou \n                até 15 ~> (15x15)"));
+        tamanhoTabuleiro = Integer.parseInt(JOptionPane.showInputDialog(" Qual a dimensão do tabuleiro?\n Digite:    3 ~> (3x3)\n                ou \n                até 15 ~> (15x15)"));
         if (tamanhoTabuleiro < 3 || tamanhoTabuleiro > 15) {
             tamanhoTabuleiro = Integer.parseInt(JOptionPane.showInputDialog("Digite um valor igual ou entre 3 a 15"));
         }
-
+        controle.iniciar(tamanhoTabuleiro);
         tabuleiro = configuraTabuleiro(tamanhoTabuleiro);
 
         backgroundTabuleiro = new JPanel();
 
-//        // Layout backgroundTabuleiro
+        // Layout backgroundTabuleiro
         javax.swing.GroupLayout jPanelbackgroundTabuleiroLayout = new javax.swing.GroupLayout(backgroundTabuleiro);
         backgroundTabuleiro.setLayout(jPanelbackgroundTabuleiroLayout);
         jPanelbackgroundTabuleiroLayout.setHorizontalGroup(
@@ -289,6 +287,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         int tamanhoCelula = 130;
         JTable jTtabuleiro = new JTable();
+
         jTtabuleiro.setModel(new TabuleiroVelha(tamanhoTabuleiro));
 
         if (tamanhoTabuleiro == 4) {
@@ -319,12 +318,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
             @Override
             public void mouseReleased(MouseEvent m) {
-                int linha = jTtabuleiro.getSelectedRow();
-                int coluna = jTtabuleiro.getSelectedColumn();
+                int row = jTtabuleiro.getSelectedRow();
+                int col = jTtabuleiro.getSelectedColumn();
 
                 try {
-
-                    //System.out.println("Linha: ");
+                    controle.selecionarCasa(row, col);
                 } catch (Exception ex) {
                     System.out.println("Msg de erro seleção: " + ex.getMessage());
 
@@ -367,5 +365,27 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator2;
     private JTable tabuleiro;
     JPanel backgroundTabuleiro = new JPanel();
-    // End of variables declaration                   
+    // End of variables declaration   
+
+    public String[][] toMatriz(JTable tabuleiro) {
+        String[][] matrizTabuleiro = new String[tamanhoTabuleiro][tamanhoTabuleiro];
+        for (int i = 0; i < tamanhoTabuleiro; i++) {
+            for (int j = 0; j < tamanhoTabuleiro; j++) {
+                matrizTabuleiro[i][j] = (String) tabuleiro.getModel().getValueAt(i, j);
+                System.out.println(matrizTabuleiro[i][j]);
+            }
+        }
+        return matrizTabuleiro;
+    }
+
+    @Override
+    public void atualizarTela() {
+        this.repaint();
+        this.backgroundTabuleiro.repaint();
+        this.jPanel3.repaint();
+        this.jPanel2.repaint();
+        this.jPanel1.repaint();
+        this.jPanelTabuleiro.repaint();
+    }
+
 }
