@@ -6,42 +6,30 @@
 package src.model;
 
 import java.awt.Component;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import src.controller.TabuleiroController;
 
 /**
  *
  * @author gabriel
  */
-public class Tabuleiro {
+public class TabuleiroVelha extends AbstractTableModel {
 
-    int tamanhoTabuleiro;
-
-    public Tabuleiro(int tamanho) {
-        this.tamanhoTabuleiro = tamanho;
-    }
-
-    
-}
-
-class TabuleiroVelha extends AbstractTableModel {
-
+    final private TabuleiroRenderer tabuleiroRender;
     final private int tamanhoTabuleiro;
-
+    final private TabuleiroController controller = TabuleiroController.getInstance();
+    
     public TabuleiroVelha(int tamanho) {
         this.tamanhoTabuleiro = tamanho;
+        this.tabuleiroRender = new TabuleiroRenderer();
     }
 
-    JLabel jLabel = new JLabel();
-
-    String[][] dados = {
-        {"X", "O", "O"},
-        {"O", "X", "O"},
-        {"O", "O", "X"}
-    };
+    public TabuleiroRenderer getTabuleiroRender() {
+        return tabuleiroRender;
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +47,7 @@ class TabuleiroVelha extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         try {
 
-            return " ";
+            return controller.getCampo(row, col);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.toString());
             return null;

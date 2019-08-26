@@ -11,4 +11,5 @@ package src.model;
  */
 public interface Observador {
     void atualizarTela();
+    void terminarJogo();
 }

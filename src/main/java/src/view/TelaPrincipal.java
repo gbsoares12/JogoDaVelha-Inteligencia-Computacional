@@ -5,75 +5,23 @@
  */
 package src.view;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import src.controller.TabuleiroController;
 import src.model.Observador;
+import src.model.TabuleiroVelha;
 
 /**
  *
  * @author gabriel
  */
-class TabuleiroVelha extends AbstractTableModel {
-
-    final private TabuleiroController controller = TabuleiroController.getInstance();
-    final private int tamanhoTabuleiro;
-    String[][] tabuleiro;
-
-    public TabuleiroVelha(int tamanho) {
-        this.tamanhoTabuleiro = tamanho;
-    }
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public int getColumnCount() {
-        return this.tamanhoTabuleiro;
-    }
-
-    @Override
-    public int getRowCount() {
-        return this.tamanhoTabuleiro;
-    }
-
-    @Override
-    public Object getValueAt(int row, int col) {
-        try {
-            return controller.getCampo(row, col);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.toString());
-            return null;
-        }
-    }
-
-}
-
-class TabuleiroRenderer extends DefaultTableCellRenderer {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table,
-            Object value, boolean isSelected, boolean hasFocus, int row,
-            int column) {
-
-        setValue(value);
-        return this;
-    }
-
-}
-
-public class TelaPrincipal extends javax.swing.JFrame implements Observador{
+public class TelaPrincipal extends javax.swing.JFrame implements Observador {
 
     int tamanhoTabuleiro;
     final private TabuleiroController controle;
@@ -109,8 +57,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
         setTitle("Jogo da Velha - IA");
         setBackground(new java.awt.Color(0, 0, 0));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        setMaximumSize(new java.awt.Dimension(1024, 650));
-        setMinimumSize(new java.awt.Dimension(1024, 650));
+        setMaximumSize(new java.awt.Dimension(1024, 1100));
+        setMinimumSize(new java.awt.Dimension(1024, 580));
         setName("framePrincipal"); // NOI18N
         setResizable(false);
 
@@ -178,7 +126,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jPanelTabuleiro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jButtonComecar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButtonComecar, javax.swing.GroupLayout.DEFAULT_SIZE, 38, javax.swing.GroupLayout.DEFAULT_SIZE)
                                 .addGap(0, 12, Short.MAX_VALUE))
         );
 
@@ -190,7 +138,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.CENTER, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pack();
     }// </editor-fold>   
@@ -199,11 +147,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
 
         if (this.backgroundTabuleiro == null) {
             montaContainerTabuleiro();
-            controle.setTabuleiro(toMatriz(tabuleiro));
         } else {
             jPanelTabuleiro.remove(backgroundTabuleiro);
             montaContainerTabuleiro();
-            controle.setTabuleiro(toMatriz(tabuleiro));
         }
 
     }
@@ -287,8 +233,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
 
         int tamanhoCelula = 130;
         JTable jTtabuleiro = new JTable();
-
-        jTtabuleiro.setModel(new TabuleiroVelha(tamanhoTabuleiro));
+        TabuleiroVelha configTabuleiro = new TabuleiroVelha(tamanhoTabuleiro);
+        jTtabuleiro.setModel(configTabuleiro);
 
         if (tamanhoTabuleiro == 4) {
             tamanhoCelula = 100;
@@ -298,10 +244,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
             tamanhoCelula = 65;
         } else if (tamanhoTabuleiro > 6 && tamanhoTabuleiro < 9) {
             tamanhoCelula = 50;
-        } else if (tamanhoTabuleiro > 8 && tamanhoTabuleiro < 12) {
+        } else if (tamanhoTabuleiro > 8 && tamanhoTabuleiro < 11) {
             tamanhoCelula = 40;
+        } else if (tamanhoTabuleiro == 11) {
+            tamanhoCelula = 35;
         } else if (tamanhoTabuleiro > 11) {
             tamanhoCelula = 30;
+        }else if (tamanhoTabuleiro > 12) {
+            tamanhoCelula = 2;
         }
 
         for (int x = 0; x < jTtabuleiro.getColumnModel().getColumnCount(); x++) {
@@ -312,7 +262,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
         jTtabuleiro.setRowHeight(tamanhoCelula);
         jTtabuleiro.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jTtabuleiro.setShowGrid(true);
-        jTtabuleiro.setDefaultRenderer(String.class, new TabuleiroRenderer());
+        jTtabuleiro.setDefaultRenderer(String.class, configTabuleiro.getTabuleiroRender());
         jTtabuleiro.setCellSelectionEnabled(true);
         jTtabuleiro.addMouseListener(new MouseListener() {
 
@@ -372,7 +322,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
         for (int i = 0; i < tamanhoTabuleiro; i++) {
             for (int j = 0; j < tamanhoTabuleiro; j++) {
                 matrizTabuleiro[i][j] = (String) tabuleiro.getModel().getValueAt(i, j);
-                System.out.println(matrizTabuleiro[i][j]);
             }
         }
         return matrizTabuleiro;
@@ -386,6 +335,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador{
         this.jPanel2.repaint();
         this.jPanel1.repaint();
         this.jPanelTabuleiro.repaint();
+    }
+
+    @Override
+    public void terminarJogo() {
+        JOptionPane.showMessageDialog(rootPane, "Terminou o jogo!");
     }
 
 }
