@@ -156,7 +156,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador {
 
     public void montaContainerTabuleiro() {
 
-        tamanhoTabuleiro = Integer.parseInt(JOptionPane.showInputDialog(" Qual a dimensão do tabuleiro?\n Digite:    3 ~> (3x3)\n                ou \n                até 15 ~> (15x15)"));
+        tamanhoTabuleiro = Integer.parseInt(JOptionPane.showInputDialog("Qual a dimensão do tabuleiro?\n Digite:\n                3 ~> (3x3)\n                ou até\n                15 ~> (15x15)"));
         if (tamanhoTabuleiro < 3 || tamanhoTabuleiro > 15) {
             tamanhoTabuleiro = Integer.parseInt(JOptionPane.showInputDialog("Digite um valor igual ou entre 3 a 15"));
         }
@@ -270,9 +270,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador {
             public void mouseReleased(MouseEvent m) {
                 int row = jTtabuleiro.getSelectedRow();
                 int col = jTtabuleiro.getSelectedColumn();
-
+                
                 try {
-                    controle.selecionarCasa(row, col);
+                    //controle.selecionarCasa(row, col);
+                    controle.selecionarCasaModoAI(row, col);
                 } catch (Exception ex) {
                     System.out.println("Msg de erro seleção: " + ex.getMessage());
 
@@ -338,8 +339,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements Observador {
     }
 
     @Override
-    public void terminarJogo() {
-        JOptionPane.showMessageDialog(rootPane, "Terminou o jogo!");
+    public void terminarJogo(String vencedor) {
+        
+        JOptionPane.showMessageDialog(rootPane, "Terminou o jogo!\n"+ (!vencedor.equals("empate") ? "Jogador "+vencedor.trim()+"\nVenceu!" : "Empate!"));
     }
 
 }

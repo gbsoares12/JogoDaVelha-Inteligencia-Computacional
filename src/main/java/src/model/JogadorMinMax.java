@@ -9,7 +9,7 @@ package src.model;
  *
  * @author gabriel
  */
-public interface Observador {
-    void atualizarTela();
-    void terminarJogo(String vencedor);
+public enum JogadorMinMax {
+    Max,
+    Min;
 }

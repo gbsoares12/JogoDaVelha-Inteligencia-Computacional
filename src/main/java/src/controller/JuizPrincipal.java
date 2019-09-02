@@ -3,24 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package src.model;
-
-import java.util.ArrayList;
-import src.controller.TabuleiroController;
-
+package src.controller;
 /**
  *
  * @author gabriel
  */
-public class Juiz {
+public class JuizPrincipal implements Juiz{
 
     final private TabuleiroController controller = TabuleiroController.getInstance();
     final private String[][] tabuleiro = controller.getTabuleiro();
     final private Object[] pecaAtual = controller.getPecaAtual();
 
-    public Juiz() {
+    public JuizPrincipal() {
+    }
+    
+    @Override
+    public boolean verificaEmpate() {
+        for (int i = 0; i < tabuleiro.length; i++) {
+            for (int j = 0; j < tabuleiro.length; j++) {
+                if(!this.tabuleiro[i][j].equals(" ")){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
+    @Override
     public boolean verificaEndGame() {
 
         if (!verificaHorizontalCompleta()) {
@@ -38,6 +47,7 @@ public class Juiz {
         }
     }
 
+    @Override
     public boolean verificaHorizontalCompleta() {
         for (int col = 0; col < this.tabuleiro.length; col++) {
             if (!pecaAtual[2].equals(this.tabuleiro[(int) pecaAtual[0]][col])) {
@@ -47,6 +57,7 @@ public class Juiz {
         return true;
     }
 
+    @Override
     public boolean verificaVerticalCompleta() {
         for (int row = 0; row < this.tabuleiro.length; row++) {
             if (!pecaAtual[2].equals(this.tabuleiro[row][(int) pecaAtual[1]])) {
@@ -56,6 +67,7 @@ public class Juiz {
         return true;
     }
 
+    @Override
     public boolean verificaDiagonalCompleta() {
         int row = 0;
         int col = 0;
