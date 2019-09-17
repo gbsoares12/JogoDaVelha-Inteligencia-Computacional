@@ -6,7 +6,6 @@
 package src.controller;
 
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 import src.model.JogadorMinMax;
 import src.model.Observado;
 import src.model.Observador;
@@ -27,6 +26,7 @@ public class TabuleiroController implements Observado {
     private JuizPrincipal juiz;
     private int quantidadeJogadas;
     private AgenteJogador agente;
+    private int profMax;
 
     public synchronized static TabuleiroController getInstance() {//Padrão Singleton
         if (instance == null) {
@@ -57,7 +57,6 @@ public class TabuleiroController implements Observado {
             } else {
                 this.tabuleiro[row][col] = this.marginPecas + "O";
             }
-
             pecaAtual[0] = row;//Linha
             pecaAtual[1] = col;//Coluna
             pecaAtual[2] = this.tabuleiro[row][col];//Value (String)
@@ -67,7 +66,6 @@ public class TabuleiroController implements Observado {
             } else if (this.turno == (this.quantidadeJogadas - 1) & this.juiz.verificaEmpate()) {
                 endGame("empate");
             }
-
             this.turno++;
             atualizarView();
         }
@@ -78,7 +76,6 @@ public class TabuleiroController implements Observado {
             System.out.println("break");
         }
         if (this.agente.getJogador().equals(JogadorMinMax.Min)) {
-
             //Eu Joguei
             if (this.tabuleiro[row][col].equals(" ")) {
 
@@ -87,6 +84,10 @@ public class TabuleiroController implements Observado {
                 //Calculo o Minimax
                 this.agente.setJogador(JogadorMinMax.Max);
                 this.agente = minimaxDecision(this.agente);
+                
+                if(this.agente == null){
+                    endGame("Você");
+                }
                 //Computador Joga
                 setTabuleiro(this.agente.getTabuleiroAgente());
                 atualizarView();
@@ -108,7 +109,10 @@ public class TabuleiroController implements Observado {
         turno++;
     }
 
-    public void iniciar(int tamanhoTabuleiro) {
+    public void iniciar(int tamanhoTabuleiro, int profundidadeMax) {
+        
+        this.profMax = profundidadeMax;
+        
         tabuleiro = new String[tamanhoTabuleiro][tamanhoTabuleiro];
         for (int i = 0; i < tamanhoTabuleiro; i++) {
             for (int j = 0; j < tamanhoTabuleiro; j++) {
@@ -146,8 +150,7 @@ public class TabuleiroController implements Observado {
     }
 
     private AgenteJogador minimaxDecision(AgenteJogador agente) {
-
-        int melhor = MaxValue(agente);
+        int melhor = MaxValue(agente, 1);
         ArrayList<AgenteJogador> filhos = agente.getTodosFilhos();
         for (AgenteJogador filho : filhos) {
             filho.mostra();
@@ -159,8 +162,8 @@ public class TabuleiroController implements Observado {
         return null;
     }
 
-    private int MinValue(AgenteJogador agente) {
-        if (agente.isTerminal()) {
+    private int MinValue(AgenteJogador agente, int prof) {
+        if (agente.isTerminal() || prof++ > this.profMax) {// Aqui vai uma condicional de profundidade
             agente.setValor(agente.getResultado());
             return agente.getValor();
         } else {
@@ -168,14 +171,14 @@ public class TabuleiroController implements Observado {
             agente.setJogador(JogadorMinMax.Min);
             ArrayList<AgenteJogador> filhos = agente.getFilhos(agente);
             for (AgenteJogador filho : filhos) {
-                agente.setValor(Math.min(agente.getValor(), MaxValue(filho)));
+                agente.setValor(Math.min(agente.getValor(), MaxValue(filho, prof)));
             }
             return agente.getValor();
         }
     }
 
-    private int MaxValue(AgenteJogador agente) {
-        if (agente.isTerminal()) {
+    private int MaxValue(AgenteJogador agente, int prof) {
+        if ( agente.isTerminal() || prof++ > this.profMax) {// Aqui vai uma condicional de profundidade
             agente.setValor(agente.getResultado());
             return agente.getValor();
         } else {
@@ -183,10 +186,9 @@ public class TabuleiroController implements Observado {
             agente.setJogador(JogadorMinMax.Max);
             ArrayList<AgenteJogador> filhos = agente.getFilhos(agente);
             for (AgenteJogador filho : filhos) {
-                agente.setValor(Math.max(agente.getValor(), MinValue(filho)));
+                agente.setValor(Math.max(agente.getValor(), MinValue(filho, prof)));
             }
             return agente.getValor();
         }
     }
-
 }
