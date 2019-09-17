@@ -150,7 +150,7 @@ public class TabuleiroController implements Observado {
     }
 
     private AgenteJogador minimaxDecision(AgenteJogador agente) {
-        int melhor = MaxValue(agente, 1);
+        int melhor = MaxValue(agente, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
         ArrayList<AgenteJogador> filhos = agente.getTodosFilhos();
         for (AgenteJogador filho : filhos) {
             filho.mostra();
@@ -162,7 +162,7 @@ public class TabuleiroController implements Observado {
         return null;
     }
 
-    private int MinValue(AgenteJogador agente, int prof) {
+    private int MinValue(AgenteJogador agente, int alfa, int beta, int prof) {
         if (agente.isTerminal() || prof++ > this.profMax) {// Aqui vai uma condicional de profundidade
             agente.setValor(agente.getResultado());
             return agente.getValor();
@@ -171,13 +171,19 @@ public class TabuleiroController implements Observado {
             agente.setJogador(JogadorMinMax.Min);
             ArrayList<AgenteJogador> filhos = agente.getFilhos(agente);
             for (AgenteJogador filho : filhos) {
-                agente.setValor(Math.min(agente.getValor(), MaxValue(filho, prof)));
+                agente.setValor(Math.min(agente.getValor(), MaxValue(filho, alfa, beta, prof)));
+                
+                if(agente.getValor() <= alfa){
+                    return agente.getValor();
+                }
+                
+                beta = Math.min(beta, agente.getValor());
             }
             return agente.getValor();
         }
     }
 
-    private int MaxValue(AgenteJogador agente, int prof) {
+    private int MaxValue(AgenteJogador agente, int alfa, int beta, int prof) {
         if ( agente.isTerminal() || prof++ > this.profMax) {// Aqui vai uma condicional de profundidade
             agente.setValor(agente.getResultado());
             return agente.getValor();
@@ -186,7 +192,13 @@ public class TabuleiroController implements Observado {
             agente.setJogador(JogadorMinMax.Max);
             ArrayList<AgenteJogador> filhos = agente.getFilhos(agente);
             for (AgenteJogador filho : filhos) {
-                agente.setValor(Math.max(agente.getValor(), MinValue(filho, prof)));
+                agente.setValor(Math.max(agente.getValor(), MinValue(filho, alfa, beta, prof)));
+                
+                if(agente.getValor() >= beta){
+                    return agente.getValor();
+                }
+                
+                alfa = Math.max(alfa, agente.getValor());
             }
             return agente.getValor();
         }
