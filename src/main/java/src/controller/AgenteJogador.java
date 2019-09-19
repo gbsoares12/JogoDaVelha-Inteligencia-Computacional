@@ -7,6 +7,7 @@ package src.controller;
 
 import java.util.ArrayList;
 import src.model.JogadorMinMax;
+import src.utils.Utilitarios;
 
 /**
  *
@@ -21,10 +22,12 @@ public class AgenteJogador {
 
     private AgenteJogador noPai;
     private ArrayList<AgenteJogador> nosFilhos = new ArrayList<>();
-
+    private String marginPecas;
+    
     public AgenteJogador(int dimensaoTabuleiro) {
         this.dimensaoTabuleiro = dimensaoTabuleiro;
         this.tabuleiroAgente = new String[dimensaoTabuleiro][dimensaoTabuleiro];
+        marginPecas = Utilitarios.defineMargin(dimensaoTabuleiro);
     }
 
     public String[][] getTabuleiroAgente() {
@@ -84,18 +87,18 @@ public class AgenteJogador {
     }
 
     public void setX(int linha, int coluna) {
-        tabuleiroAgente[linha][coluna] = "X";
+        tabuleiroAgente[linha][coluna] = this.marginPecas +"X";
     }
 
     public void setO(int linha, int coluna) {
-        tabuleiroAgente[linha][coluna] = "O";
+        tabuleiroAgente[linha][coluna] = this.marginPecas +"O";
     }
 
     public boolean verificaPerdeuHorizontal() {
         int casasFeitas = 0;
         for (int row = 0; row < this.dimensaoTabuleiro; row++) {
             for (int col = 0; col < this.dimensaoTabuleiro; col++) {
-                if (this.tabuleiroAgente[row][col].equals("X")) {
+                if (this.tabuleiroAgente[row][col].equals(this.marginPecas +"X")) {
                     casasFeitas++;
                     if (casasFeitas == this.dimensaoTabuleiro) {
                         return true;
@@ -111,7 +114,7 @@ public class AgenteJogador {
         int casasFeitas = 0;
         for (int col = 0; col < this.dimensaoTabuleiro; col++) {
             for (int row = 0; row < this.dimensaoTabuleiro; row++) {
-                if (this.tabuleiroAgente[row][col].equals("X")) {
+                if (this.tabuleiroAgente[row][col].equals(this.marginPecas +"X")) {
                     casasFeitas++;
                     if (casasFeitas == this.dimensaoTabuleiro) {
                         return true;
@@ -127,7 +130,7 @@ public class AgenteJogador {
         int casaFeitasVertical = 0;
         int casaFeitasVerticalInvertido = 0;
         for (int i = 0; i < this.dimensaoTabuleiro; i++) {
-            if (this.tabuleiroAgente[i][i].equals("X")) {
+            if (this.tabuleiroAgente[i][i].equals(this.marginPecas +"X")) {
                 casaFeitasVertical++;
             }
         }
@@ -137,7 +140,7 @@ public class AgenteJogador {
         int row = this.dimensaoTabuleiro - 1;
         int col = 0;
         while (row >= 0) {
-            if (this.tabuleiroAgente[row][col].equals("X")) {
+            if (this.tabuleiroAgente[row][col].equals(this.marginPecas +"X")) {
                 casaFeitasVerticalInvertido++;
             }
             row--;
@@ -150,7 +153,7 @@ public class AgenteJogador {
         int casasFeitas = 0;
         for (int row = 0; row < this.dimensaoTabuleiro; row++) {
             for (int col = 0; col < this.dimensaoTabuleiro; col++) {
-                if (this.tabuleiroAgente[row][col].equals("O")) {
+                if (this.tabuleiroAgente[row][col].equals(this.marginPecas +"O")) {
                     casasFeitas++;
                     if (casasFeitas == this.dimensaoTabuleiro) {
                         return true;
@@ -167,7 +170,7 @@ public class AgenteJogador {
 
         for (int col = 0; col < this.dimensaoTabuleiro; col++) {
             for (int row = 0; row < this.dimensaoTabuleiro; row++) {
-                if (this.tabuleiroAgente[row][col].equals("O")) {
+                if (this.tabuleiroAgente[row][col].equals(this.marginPecas +"O")) {
                     casasFeitas++;
                     if (casasFeitas == this.dimensaoTabuleiro) {
                         return true;
@@ -184,7 +187,7 @@ public class AgenteJogador {
         int casaFeitasVerticalInvertido = 0;
 
         for (int i = 0; i < this.dimensaoTabuleiro; i++) {
-            if (this.tabuleiroAgente[i][i].equals("O")) {
+            if (this.tabuleiroAgente[i][i].equals(this.marginPecas +"O")) {
                 casaFeitasVertical++;
             }
         }
@@ -195,7 +198,7 @@ public class AgenteJogador {
         int row = this.dimensaoTabuleiro - 1;
         int col = 0;
         while (row >= 0) {
-            if (this.tabuleiroAgente[row][col].equals("O")) {
+            if (this.tabuleiroAgente[row][col].equals(this.marginPecas +"O")) {
                 casaFeitasVerticalInvertido++;
             }
             row--;
@@ -255,7 +258,7 @@ public class AgenteJogador {
             }
             System.out.println("");
         }
-        System.out.println("Utilidade: " + this.getValor());
+        System.out.println("Utilidade: " + this.getValor() + "\n");
     }
 
     public ArrayList<AgenteJogador> getTodosFilhos() {

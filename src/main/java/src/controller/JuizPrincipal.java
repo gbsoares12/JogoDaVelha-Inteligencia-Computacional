@@ -11,9 +11,13 @@ package src.controller;
 public class JuizPrincipal implements Juiz{
 
     final private TabuleiroController controller = TabuleiroController.getInstance();
-    final private String[][] tabuleiro = controller.getTabuleiro();
+    private String[][] tabuleiro = controller.getTabuleiro();
     final private Object[] pecaAtual = controller.getPecaAtual();
 
+    public void setTabuleiro(String[][] tabuleiro) {
+        this.tabuleiro = tabuleiro;
+    }
+    
     public JuizPrincipal() {
     }
     

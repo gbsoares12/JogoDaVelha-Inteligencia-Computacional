@@ -72,37 +72,45 @@ public class TabuleiroController implements Observado {
     }
 
     public void selecionarCasaModoAI(int row, int col) {
-        if(turno ==2) {
-            System.out.println("break");
-        }
+
         if (this.agente.getJogador().equals(JogadorMinMax.Min)) {
             //Eu Joguei
             if (this.tabuleiro[row][col].equals(" ")) {
 
-                this.tabuleiro[row][col] = "X";
-                this.agente.setX(row, col);
-                //Calculo o Minimax
-                this.agente.setJogador(JogadorMinMax.Max);
-                this.agente = minimaxDecision(this.agente);
-                
-                if(this.agente == null){
-                    endGame("Você");
-                }
-                //Computador Joga
-                setTabuleiro(this.agente.getTabuleiroAgente());
-                atualizarView();
-                this.agente.setJogador(JogadorMinMax.Min);
-                if (this.agente.isTerminal()) {
-                    if (this.agente.ganhou()) {
-                        endGame("Computador");
-                    }
-                    if (this.agente.perdeu()) {
+                this.tabuleiro[row][col] = this.marginPecas + "X";
+                pecaAtual[0] = row;//Linha
+                pecaAtual[1] = col;//Coluna
+                pecaAtual[2] = this.tabuleiro[row][col];//Value (String)
+                if (this.juiz.verificaEndGame()) {
+                    endGame((String) pecaAtual[2]);
+                } else {
+                    this.agente.setX(row, col);
+                    //Calculo o Minimax
+                    this.agente.setJogador(JogadorMinMax.Max);
+                    this.agente = minimaxDecision(this.agente);
+
+                    if (this.agente == null) {
                         endGame("Você");
                     }
-                    if (this.agente.empate()) {
-                        endGame("empate");
+                    //Computador Joga
+                    setTabuleiro(this.agente.getTabuleiroAgente());
+                    this.juiz.setTabuleiro(this.agente.getTabuleiroAgente());
+                    atualizarView();
+                    this.agente.setJogador(JogadorMinMax.Min);
+                    
+                    if (this.agente.isTerminal()) {
+                        if (this.agente.ganhou()) {
+                            endGame("Computador");
+                        }
+                        if (this.agente.perdeu()) {
+                            endGame("Você");
+                        }
+                        if (this.agente.empate()) {
+                            endGame("empate");
+                        }
                     }
                 }
+
 
             }
         }
@@ -110,9 +118,9 @@ public class TabuleiroController implements Observado {
     }
 
     public void iniciar(int tamanhoTabuleiro, int profundidadeMax) {
-        
+
         this.profMax = profundidadeMax;
-        
+
         tabuleiro = new String[tamanhoTabuleiro][tamanhoTabuleiro];
         for (int i = 0; i < tamanhoTabuleiro; i++) {
             for (int j = 0; j < tamanhoTabuleiro; j++) {
@@ -154,7 +162,7 @@ public class TabuleiroController implements Observado {
         ArrayList<AgenteJogador> filhos = agente.getTodosFilhos();
         for (AgenteJogador filho : filhos) {
             filho.mostra();
-            System.out.println("");
+
             if (filho.getValor() == melhor) {
                 return filho;
             }
@@ -163,7 +171,7 @@ public class TabuleiroController implements Observado {
     }
 
     private int MinValue(AgenteJogador agente, int alfa, int beta, int prof) {
-        if (agente.isTerminal() || prof++ > this.profMax) {// Aqui vai uma condicional de profundidade
+        if (agente.isTerminal() || prof++ > this.profMax) {
             agente.setValor(agente.getResultado());
             return agente.getValor();
         } else {
@@ -172,11 +180,11 @@ public class TabuleiroController implements Observado {
             ArrayList<AgenteJogador> filhos = agente.getFilhos(agente);
             for (AgenteJogador filho : filhos) {
                 agente.setValor(Math.min(agente.getValor(), MaxValue(filho, alfa, beta, prof)));
-                
-                if(agente.getValor() <= alfa){
+
+                if (agente.getValor() <= alfa) {
                     return agente.getValor();
                 }
-                
+
                 beta = Math.min(beta, agente.getValor());
             }
             return agente.getValor();
@@ -184,7 +192,7 @@ public class TabuleiroController implements Observado {
     }
 
     private int MaxValue(AgenteJogador agente, int alfa, int beta, int prof) {
-        if ( agente.isTerminal() || prof++ > this.profMax) {// Aqui vai uma condicional de profundidade
+        if (agente.isTerminal() || prof++ > this.profMax) {
             agente.setValor(agente.getResultado());
             return agente.getValor();
         } else {
@@ -193,11 +201,11 @@ public class TabuleiroController implements Observado {
             ArrayList<AgenteJogador> filhos = agente.getFilhos(agente);
             for (AgenteJogador filho : filhos) {
                 agente.setValor(Math.max(agente.getValor(), MinValue(filho, alfa, beta, prof)));
-                
-                if(agente.getValor() >= beta){
+
+                if (agente.getValor() >= beta) {
                     return agente.getValor();
                 }
-                
+
                 alfa = Math.max(alfa, agente.getValor());
             }
             return agente.getValor();
